@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--
+  Shared page furniture.
+
+  Plain Thymeleaf fragments rather than the layout dialect: thymeleaf-layout-dialect
+  is a separate dependency, and `th:replace` covers a handful of screens perfectly
+  well. Each page is a complete document that pulls these pieces in.
+-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="'BrandX · ' + ${title}">BrandX</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+
+<body>
+
+<!--
+  Named `topbar`, not `nav`: a fragment selector matches by element name as well as by
+  th:fragment, so `:: nav(...)` would also pull in every literal <nav> element in this
+  file — including the pager below, which then evaluates against a page that is not in
+  a non-list page's model.
+-->
+<header class="topbar" th:fragment="topbar(active)">
+    <div class="container topbar-inner">
+        <a class="brand" th:href="@{/}">Brand<span>X</span></a>
+        <nav class="mainnav">
+            <a th:href="@{/products}" th:classappend="${active == 'products'} ? 'on'">Products</a>
+            <a th:href="@{/orders}" th:classappend="${active == 'orders'} ? 'on'">Orders</a>
+            <a th:href="@{/customers}" th:classappend="${active == 'customers'} ? 'on'">Customers</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Flash messages set by the controllers via RedirectAttributes. -->
+<div th:fragment="alerts">
+    <div class="alert alert-ok" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-bad" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+</div>
+
+<!--
+  Pagination. `search` and `sort` are carried through explicitly so that paging does
+  not silently drop the user's filter or column ordering.
+-->
+<nav class="pager" th:fragment="pagination(page, baseUrl, search, sort)" th:if="${page != null and page.totalPages > 1}">
+    <a class="btn btn-small" th:if="${!page.first}"
+       th:href="@{${baseUrl}(page=${page.number - 1}, size=${page.size}, search=${search}, sort=${sort})}">&larr; Previous</a>
+    <span class="pager-state"
+          th:text="'Page ' + (${page.number} + 1) + ' of ' + ${page.totalPages} + ' (' + ${page.totalElements} + ' total)'"></span>
+    <a class="btn btn-small" th:if="${!page.last}"
+       th:href="@{${baseUrl}(page=${page.number + 1}, size=${page.size}, search=${search}, sort=${sort})}">Next &rarr;</a>
+</nav>
+
+<footer class="footer" th:fragment="footer">
+    <div class="container">BrandX · Spring Boot 4 · Java 21</div>
+</footer>
+
+</body>
+</html>

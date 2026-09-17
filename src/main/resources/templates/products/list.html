@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Products')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar('products')}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="container">
+    <div class="page-head">
+        <h1>Products</h1>
+        <a class="btn btn-primary" th:href="@{/products/new}">New product</a>
+    </div>
+
+    <form class="search" method="get" th:action="@{/products}">
+        <input type="search" name="search" th:value="${search}" placeholder="Search by name or SKU">
+        <button type="submit" class="btn">Search</button>
+        <a class="btn btn-quiet" th:if="${search}" th:href="@{/products}">Clear</a>
+    </form>
+
+    <p class="empty" th:if="${page.totalElements == 0}">
+        <span th:if="${search}">No products match that search.</span>
+        <span th:unless="${search}">No products yet. Create the first one.</span>
+    </p>
+
+    <div th:unless="${page.totalElements == 0}">
+        <table>
+            <thead>
+            <tr>
+                <!-- Column links flip direction and preserve the active search. -->
+                <th><a th:href="@{/products(search=${search}, size=${page.size},
+                        sort=${sort == 'sku,asc'} ? 'sku,desc' : 'sku,asc')}">SKU</a></th>
+                <th><a th:href="@{/products(search=${search}, size=${page.size},
+                        sort=${sort == 'name,asc'} ? 'name,desc' : 'name,asc')}">Name</a></th>
+                <th class="num"><a th:href="@{/products(search=${search}, size=${page.size},
+                        sort=${sort == 'price,asc'} ? 'price,desc' : 'price,asc')}">Price</a></th>
+                <th class="num"><a th:href="@{/products(search=${search}, size=${page.size},
+                        sort=${sort == 'stockQuantity,asc'} ? 'stockQuantity,desc' : 'stockQuantity,asc')}">Stock</a></th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product : ${page.content}">
+                <td><a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.sku}">SKU</a></td>
+                <td th:text="${product.name}">Name</td>
+                <td class="num" th:text="${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                <td class="num" th:text="${product.stockQuantity}">0</td>
+                <td>
+                    <span th:class="${product.active} ? 'pill pill-on' : 'pill pill-off'"
+                          th:text="${product.active} ? 'Active' : 'Inactive'">Active</span>
+                </td>
+                <td class="actions">
+                    <a class="btn btn-small" th:href="@{/products/{id}/edit(id=${product.id})}">Edit</a>
+                    <form method="post" th:action="@{/products/{id}/delete(id=${product.id})}"
+                          onsubmit="return confirm('Delete this product? This cannot be undone.')">
+                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <nav th:replace="~{fragments/layout :: pagination(${page}, '/products', ${search}, ${sort})}"></nav>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Customers')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar('customers')}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="container">
+    <div class="page-head">
+        <h1>Customers</h1>
+        <a class="btn btn-primary" th:href="@{/customers/new}">New customer</a>
+    </div>
+
+    <form class="search" method="get" th:action="@{/customers}">
+        <input type="search" name="search" th:value="${search}" placeholder="Search by name or email">
+        <button type="submit" class="btn">Search</button>
+        <a class="btn btn-quiet" th:if="${search}" th:href="@{/customers}">Clear</a>
+    </form>
+
+    <p class="empty" th:if="${page.totalElements == 0}">
+        <span th:if="${search}">No customers match that search.</span>
+        <span th:unless="${search}">No customers yet. Create the first one.</span>
+    </p>
+
+    <div th:unless="${page.totalElements == 0}">
+        <table>
+            <thead>
+            <tr>
+                <th><a th:href="@{/customers(search=${search}, size=${page.size},
+                        sort=${sort == 'lastName,asc'} ? 'lastName,desc' : 'lastName,asc')}">Name</a></th>
+                <th><a th:href="@{/customers(search=${search}, size=${page.size},
+                        sort=${sort == 'email,asc'} ? 'email,desc' : 'email,asc')}">Email</a></th>
+                <th>Phone</th>
+                <th>Location</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="customer : ${page.content}">
+                <td><a th:href="@{/customers/{id}(id=${customer.id})}" th:text="${customer.fullName}">Name</a></td>
+                <td th:text="${customer.email}">email</td>
+                <td>
+                    <span th:if="${customer.phone}" th:text="${customer.phone}">—</span>
+                    <span class="muted" th:unless="${customer.phone}">—</span>
+                </td>
+                <td>
+                    <!--
+                      #strings.isEmpty rather than a bare `${...city}`: SpEL's `and` and its
+                      ternary condition both demand a Boolean, and it will not coerce a String
+                      like "Boston" into one.
+                    -->
+                    <span th:if="${customer.address != null and !#strings.isEmpty(customer.address.city)}"
+                          th:text="${customer.address.city + (#strings.isEmpty(customer.address.state) ? '' : ', ' + customer.address.state)}">—</span>
+                    <span class="muted" th:unless="${customer.address != null and !#strings.isEmpty(customer.address.city)}">—</span>
+                </td>
+                <td class="actions">
+                    <a class="btn btn-small" th:href="@{/customers/{id}/edit(id=${customer.id})}">Edit</a>
+                    <form method="post" th:action="@{/customers/{id}/delete(id=${customer.id})}"
+                          onsubmit="return confirm('Delete this customer? This cannot be undone.')">
+                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <nav th:replace="~{fragments/layout :: pagination(${page}, '/customers', ${search}, ${sort})}"></nav>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!--
+  Catch-all error page. Spring Boot resolves templates/error.html for any error that
+  no more specific handler claimed, replacing the default whitelabel page.
+-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Something went wrong')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar('')}"></header>
+
+<main class="container">
+    <div class="page-head">
+        <h1 th:text="${status} != null ? 'Error ' + ${status} : 'Something went wrong'">Something went wrong</h1>
+    </div>
+    <div class="panel">
+        <p th:text="${error}">Unexpected error</p>
+        <p class="muted" th:if="${path}" th:text="'Path: ' + ${path}"></p>
+        <a class="btn" th:href="@{/}">Back to dashboard</a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

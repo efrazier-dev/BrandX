@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Order ' + ${order.orderNumber})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar('orders')}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="container">
+    <p class="crumb"><a th:href="@{/orders}">Orders</a> / <span th:text="${order.orderNumber}">BX-…</span></p>
+    <div class="page-head">
+        <h1 th:text="${order.orderNumber}">Order</h1>
+        <div style="display:flex; gap:10px">
+            <a class="btn" th:href="@{/orders/{id}/edit(id=${order.id})}">Edit</a>
+            <form method="post" th:action="@{/orders/{id}/delete(id=${order.id})}"
+                  onsubmit="return confirm('Delete this order and all of its line items?')">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Summary</h2>
+        <dl class="detail">
+            <dt>Customer</dt>
+            <dd>
+                <a th:href="@{/customers/{id}(id=${order.customer.id})}"
+                   th:text="${order.customer.fullName}">Customer</a>
+                <span class="muted" th:text="' · ' + ${order.customer.email}"></span>
+            </dd>
+
+            <dt>Status</dt>
+            <dd>
+                <span class="pill" th:classappend="'status-' + ${order.status.name()}"
+                      th:text="${order.status.label}">New</span>
+            </dd>
+
+            <dt>Ordered</dt>
+            <dd th:text="${#temporals.format(order.orderedAt, 'd MMM yyyy, HH:mm')}">—</dd>
+
+            <dt>Notes</dt>
+            <dd>
+                <span th:if="${order.notes}" th:text="${order.notes}">—</span>
+                <span class="muted" th:unless="${order.notes}">None</span>
+            </dd>
+        </dl>
+    </div>
+
+    <div class="panel">
+        <h2>Line items</h2>
+        <!-- order.items and each item.product are fetch-joined by findDetailById. -->
+        <table>
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th class="num">Unit price</th>
+                <th class="num">Qty</th>
+                <th class="num">Line total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${order.items}">
+                <td><a th:href="@{/products/{id}(id=${item.product.id})}" th:text="${item.product.name}">Product</a>
+                </td>
+                <td th:text="${item.product.sku}">SKU</td>
+                <td class="num" th:text="${#numbers.formatDecimal(item.unitPrice, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                <td class="num" th:text="${item.quantity}">0</td>
+                <td class="num" th:text="${#numbers.formatDecimal(item.lineTotal, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr class="total-row">
+                <td colspan="4">Order total</td>
+                <td class="num" th:text="${#numbers.formatDecimal(order.total, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+            </tr>
+            </tfoot>
+        </table>
+        <p class="hint" style="margin-top:10px">
+            Unit prices are captured when a line is created, so repricing a product does
+            not alter existing orders.
+        </p>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

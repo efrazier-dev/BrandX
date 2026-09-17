@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${product.name})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar('products')}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="container">
+    <p class="crumb"><a th:href="@{/products}">Products</a> / <span th:text="${product.sku}">SKU</span></p>
+    <div class="page-head">
+        <h1 th:text="${product.name}">Product</h1>
+        <div style="display:flex; gap:10px">
+            <a class="btn" th:href="@{/products/{id}/edit(id=${product.id})}">Edit</a>
+            <form method="post" th:action="@{/products/{id}/delete(id=${product.id})}"
+                  onsubmit="return confirm('Delete this product? This cannot be undone.')">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Details</h2>
+        <dl class="detail">
+            <dt>SKU</dt>
+            <dd th:text="${product.sku}">—</dd>
+
+            <dt>Price</dt>
+            <dd th:text="${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}">0.00</dd>
+
+            <dt>Stock quantity</dt>
+            <dd th:text="${product.stockQuantity}">0</dd>
+
+            <dt>Status</dt>
+            <dd>
+                <span th:class="${product.active} ? 'pill pill-on' : 'pill pill-off'"
+                      th:text="${product.active} ? 'Active' : 'Inactive'">Active</span>
+            </dd>
+
+            <dt>Description</dt>
+            <dd>
+                <span th:if="${product.description}" th:text="${product.description}">—</span>
+                <span class="muted" th:unless="${product.description}">Not set</span>
+            </dd>
+
+            <dt>Created</dt>
+            <dd th:text="${product.createdAt} != null
+                    ? ${#temporals.format(product.createdAt, 'd MMM yyyy, HH:mm')} : '—'">—</dd>
+
+            <dt>Last updated</dt>
+            <dd th:text="${product.updatedAt} != null
+                    ? ${#temporals.format(product.updatedAt, 'd MMM yyyy, HH:mm')} : '—'">—</dd>
+        </dl>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

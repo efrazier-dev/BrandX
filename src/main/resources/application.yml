@@ -1,0 +1,47 @@
+# Base configuration, shared by every environment.
+#
+# Database portability is the guiding constraint here: no Java code and no mapping
+# annotation names a specific database, and this file names one only as a default
+# value that an environment variable can override.
+spring:
+  application:
+    name: brandx
+
+  # Used when no profile is set explicitly, so a bare `./mvnw spring-boot:run`
+  # gets the H2 + seed-data developer setup.
+  profiles:
+    default: dev
+
+  datasource:
+    # Every value is an env-var override with an H2 fallback, so the same artifact
+    # can be pointed at another database without a rebuild:
+    #   DB_URL=jdbc:postgresql://host:5432/brandx DB_USERNAME=... DB_PASSWORD=...
+    url: ${DB_URL:jdbc:h2:mem:brandx;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    # driver-class-name is intentionally NOT set: Boot infers it from the URL, so
+    # pinning it here would be one more thing to remember to change per database.
+
+  jpa:
+    # database-platform / the Hibernate dialect are intentionally NOT set either.
+    # Hibernate detects the dialect from the live connection; hard-coding H2Dialect
+    # is exactly the kind of thing that breaks the move to another engine.
+    hibernate:
+      ddl-auto: ${DDL_AUTO:update}
+    # Off deliberately. With open-in-view enabled, lazy associations get initialised
+    # during view rendering, which hides N+1s until they hit production. Keeping it
+    # off forces the service layer to fetch what the templates need (see
+    # OrderRepository.findDetailById and the @EntityGraph on findAll).
+    open-in-view: false
+
+  h2:
+    console:
+      enabled: false
+
+server:
+  port: ${PORT:8080}
+
+# Application-specific settings live under this namespace.
+brandx:
+  # Insert demo products/customers/orders on an empty database. Dev profile only.
+  seed-data: false

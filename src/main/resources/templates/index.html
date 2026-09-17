@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar('')}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="container">
+    <div class="page-head">
+        <h1>Dashboard</h1>
+    </div>
+
+    <div class="tiles">
+        <a class="tile" th:href="@{/products}">
+            <div class="tile-label">Products</div>
+            <div class="tile-value" th:text="${productCount}">0</div>
+        </a>
+        <a class="tile" th:href="@{/orders}">
+            <div class="tile-label">Orders</div>
+            <div class="tile-value" th:text="${orderCount}">0</div>
+        </a>
+        <a class="tile" th:href="@{/customers}">
+            <div class="tile-label">Customers</div>
+            <div class="tile-value" th:text="${customerCount}">0</div>
+        </a>
+    </div>
+
+    <div class="panel">
+        <h2>Getting started</h2>
+        <p class="muted" style="margin-top:0">
+            Business requirements are still being defined, so this is a deliberately plain
+            CRUD skeleton over the three core entities. Each area supports list, search,
+            create, view, edit and delete.
+        </p>
+        <div class="form-actions" style="border-top:0; padding-top:0; margin-top:14px">
+            <a class="btn btn-primary" th:href="@{/orders/new}">New order</a>
+            <a class="btn" th:href="@{/products/new}">New product</a>
+            <a class="btn" th:href="@{/customers/new}">New customer</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${customer.fullName})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar('customers')}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="container">
+    <p class="crumb"><a th:href="@{/customers}">Customers</a> / <span th:text="${customer.fullName}">Name</span></p>
+    <div class="page-head">
+        <h1 th:text="${customer.fullName}">Customer</h1>
+        <div style="display:flex; gap:10px">
+            <a class="btn" th:href="@{/customers/{id}/edit(id=${customer.id})}">Edit</a>
+            <form method="post" th:action="@{/customers/{id}/delete(id=${customer.id})}"
+                  onsubmit="return confirm('Delete this customer? This cannot be undone.')">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Contact</h2>
+        <dl class="detail">
+            <dt>Email</dt>
+            <dd th:text="${customer.email}">—</dd>
+
+            <dt>Phone</dt>
+            <dd>
+                <span th:if="${customer.phone}" th:text="${customer.phone}">—</span>
+                <span class="muted" th:unless="${customer.phone}">Not set</span>
+            </dd>
+
+            <dt>Orders</dt>
+            <dd>
+                <a th:if="${orderCount > 0}" th:href="@{/orders(search=${customer.email})}"
+                   th:text="${orderCount} + ' order(s)'">0</a>
+                <span class="muted" th:if="${orderCount == 0}">None yet</span>
+            </dd>
+
+            <dt>Created</dt>
+            <dd th:text="${customer.createdAt} != null
+                    ? ${#temporals.format(customer.createdAt, 'd MMM yyyy, HH:mm')} : '—'">—</dd>
+        </dl>
+    </div>
+
+    <div class="panel">
+        <h2>Address</h2>
+        <p class="muted" th:if="${customer.address == null or customer.address.empty}"
+           style="margin:0">No address on file.</p>
+        <dl class="detail" th:if="${customer.address != null and !customer.address.empty}">
+            <dt>Street</dt>
+            <dd>
+                <span th:text="${customer.address.line1}">—</span>
+                <span th:if="${customer.address.line2}" th:text="', ' + ${customer.address.line2}"></span>
+            </dd>
+
+            <dt>City</dt>
+            <dd th:text="${customer.address.city} ?: '—'">—</dd>
+
+            <dt>State / region</dt>
+            <dd th:text="${customer.address.state} ?: '—'">—</dd>
+
+            <dt>Postal code</dt>
+            <dd th:text="${customer.address.postalCode} ?: '—'">—</dd>
+
+            <dt>Country</dt>
+            <dd th:text="${customer.address.country} ?: '—'">—</dd>
+        </dl>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

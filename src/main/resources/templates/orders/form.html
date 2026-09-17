@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${orderForm.id} == null ? 'New order' : 'Edit order')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar('orders')}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="container">
+    <p class="crumb"><a th:href="@{/orders}">Orders</a> /
+        <span th:text="${orderForm.id} == null ? 'New' : ${orderForm.orderNumber}">New</span></p>
+    <div class="page-head">
+        <h1 th:text="${orderForm.id} == null ? 'New order' : 'Edit order ' + ${orderForm.orderNumber}">New order</h1>
+    </div>
+
+    <form method="post" th:object="${orderForm}"
+          th:action="${orderForm.id} == null ? @{/orders} : @{/orders/{id}(id=${orderForm.id})}">
+        <input type="hidden" th:field="*{id}">
+        <input type="hidden" th:field="*{orderNumber}">
+
+        <div class="panel">
+            <h2>Summary</h2>
+
+            <div class="field-row">
+                <div class="field" th:classappend="${#fields.hasErrors('customerId')} ? 'has-error'">
+                    <label for="customerId">Customer</label>
+                    <select id="customerId" th:field="*{customerId}">
+                        <option value="">— select a customer —</option>
+                        <option th:each="candidate : ${customers}"
+                                th:value="${candidate.id}"
+                                th:text="${candidate.displayName}">Customer
+                        </option>
+                    </select>
+                    <p class="field-error" th:if="${#fields.hasErrors('customerId')}" th:errors="*{customerId}"></p>
+                </div>
+
+                <div class="field" th:classappend="${#fields.hasErrors('status')} ? 'has-error'">
+                    <label for="status">Status</label>
+                    <select id="status" th:field="*{status}">
+                        <option th:each="candidate : ${statuses}"
+                                th:value="${candidate.name()}"
+                                th:text="${candidate.label}">Status
+                        </option>
+                    </select>
+                    <p class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></p>
+                </div>
+            </div>
+
+            <div class="field" th:classappend="${#fields.hasErrors('notes')} ? 'has-error'">
+                <label for="notes">Notes</label>
+                <textarea id="notes" th:field="*{notes}"></textarea>
+                <p class="field-error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Line items</h2>
+
+            <!-- Error on the collection itself, e.g. the "at least one line" rule. -->
+            <p class="field-error" th:if="${#fields.hasErrors('items')}" th:errors="*{items}"></p>
+
+            <table id="lines">
+                <thead>
+                <tr>
+                    <th style="width:55%">Product</th>
+                    <th style="width:25%">Quantity</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <!--
+                  Indexed binding: the __${...}__ preprocessing syntax expands the loop
+                  index into the property path, producing items[0].productId and so on,
+                  which is what Spring's data binder expects for a collection.
+                -->
+                <tr class="line-row" th:each="line, stat : *{items}">
+                    <td>
+                        <select th:field="*{items[__${stat.index}__].productId}">
+                            <option value="">— select a product —</option>
+                            <option th:each="candidate : ${products}"
+                                    th:value="${candidate.id}"
+                                    th:text="${candidate.displayName}">Product
+                            </option>
+                        </select>
+                        <p class="field-error"
+                           th:if="${#fields.hasErrors('items[__${stat.index}__].productId')}"
+                           th:errors="*{items[__${stat.index}__].productId}"></p>
+                    </td>
+                    <td>
+                        <input type="number" min="1" th:field="*{items[__${stat.index}__].quantity}">
+                        <p class="field-error"
+                           th:if="${#fields.hasErrors('items[__${stat.index}__].quantity')}"
+                           th:errors="*{items[__${stat.index}__].quantity}"></p>
+                    </td>
+                    <td class="actions">
+                        <button type="button" class="btn btn-small btn-danger js-remove-line">Remove</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <p class="empty" id="no-lines" th:style="${#lists.isEmpty(orderForm.items)} ? '' : 'display:none'">
+                No line items yet. Add at least one.
+            </p>
+
+            <div style="margin-top:14px">
+                <button type="button" class="btn" id="add-line">Add line</button>
+            </div>
+
+            <p class="hint" style="margin-top:12px">
+                Each line's unit price is taken from the product's current price when the line
+                is first added, and is preserved on later edits.
+            </p>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary"
+                    th:text="${orderForm.id} == null ? 'Create order' : 'Save changes'">Create order
+            </button>
+            <a class="btn btn-quiet"
+               th:href="${orderForm.id} == null ? @{/orders} : @{/orders/{id}(id=${orderForm.id})}">Cancel</a>
+        </div>
+    </form>
+
+    <!--
+      Blueprint for a new row. Lives in a <template> so the browser does not submit
+      it; __INDEX__ is substituted with the next row number by order-lines.js.
+    -->
+    <template id="line-template">
+        <tr class="line-row">
+            <td>
+                <select name="items[__INDEX__].productId">
+                    <option value="">— select a product —</option>
+                    <option th:each="candidate : ${products}"
+                            th:value="${candidate.id}"
+                            th:text="${candidate.displayName}">Product
+                    </option>
+                </select>
+            </td>
+            <td>
+                <input type="number" min="1" name="items[__INDEX__].quantity" value="1">
+            </td>
+            <td class="actions">
+                <button type="button" class="btn btn-small btn-danger js-remove-line">Remove</button>
+            </td>
+        </tr>
+    </template>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script th:src="@{/js/order-lines.js}"></script>
+</body>
+</html>

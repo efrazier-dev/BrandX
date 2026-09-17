@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Orders')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topbar('orders')}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="container">
+    <div class="page-head">
+        <h1>Orders</h1>
+        <a class="btn btn-primary" th:href="@{/orders/new}">New order</a>
+    </div>
+
+    <form class="search" method="get" th:action="@{/orders}">
+        <input type="search" name="search" th:value="${search}" placeholder="Search by order number or customer">
+        <button type="submit" class="btn">Search</button>
+        <a class="btn btn-quiet" th:if="${search}" th:href="@{/orders}">Clear</a>
+    </form>
+
+    <p class="empty" th:if="${page.totalElements == 0}">
+        <span th:if="${search}">No orders match that search.</span>
+        <span th:unless="${search}">No orders yet. Create the first one.</span>
+    </p>
+
+    <div th:unless="${page.totalElements == 0}">
+        <table>
+            <thead>
+            <tr>
+                <th><a th:href="@{/orders(search=${search}, size=${page.size},
+                        sort=${sort == 'orderNumber,asc'} ? 'orderNumber,desc' : 'orderNumber,asc')}">Order</a></th>
+                <th>Customer</th>
+                <th><a th:href="@{/orders(search=${search}, size=${page.size},
+                        sort=${sort == 'status,asc'} ? 'status,desc' : 'status,asc')}">Status</a></th>
+                <th><a th:href="@{/orders(search=${search}, size=${page.size},
+                        sort=${sort == 'orderedAt,desc'} ? 'orderedAt,asc' : 'orderedAt,desc')}">Ordered</a></th>
+                <th class="num">Total</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <!--
+              order.customer is safe to read here: OrderRepository attaches an entity
+              graph for it. order.items is NOT fetched, which is why the total comes
+              from the pre-computed `totals` map rather than order.total.
+            -->
+            <tr th:each="order : ${page.content}">
+                <td><a th:href="@{/orders/{id}(id=${order.id})}" th:text="${order.orderNumber}">BX-…</a></td>
+                <td>
+                    <a th:href="@{/customers/{id}(id=${order.customer.id})}"
+                       th:text="${order.customer.fullName}">Customer</a>
+                </td>
+                <td>
+                    <span class="pill" th:classappend="'status-' + ${order.status.name()}"
+                          th:text="${order.status.label}">New</span>
+                </td>
+                <td th:text="${#temporals.format(order.orderedAt, 'd MMM yyyy, HH:mm')}">—</td>
+                <td class="num"
+                    th:text="${totals[order.id]} != null
+                        ? ${#numbers.formatDecimal(totals[order.id], 1, 'COMMA', 2, 'POINT')} : '0.00'">0.00</td>
+                <td class="actions">
+                    <a class="btn btn-small" th:href="@{/orders/{id}/edit(id=${order.id})}">Edit</a>
+                    <form method="post" th:action="@{/orders/{id}/delete(id=${order.id})}"
+                          onsubmit="return confirm('Delete this order and all of its line items?')">
+                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <nav th:replace="~{fragments/layout :: pagination(${page}, '/orders', ${search}, ${sort})}"></nav>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

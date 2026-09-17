@@ -1,0 +1,21 @@
+# PostgreSQL profile.
+#
+#   ./mvnw -Ppostgres spring-boot:run -Dspring-boot.run.profiles=postgres
+#
+# The -Ppostgres Maven profile puts the JDBC driver on the classpath; this file
+# supplies the connection. Override any value with the matching env var.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/brandx}
+    username: ${DB_USERNAME:brandx}
+    password: ${DB_PASSWORD:brandx}
+
+  jpa:
+    hibernate:
+      # `validate`, not `update`: Hibernate must not be issuing DDL against a shared
+      # database. The app will fail fast on startup if the schema does not match,
+      # which is the signal that it is time to introduce Flyway migrations.
+      ddl-auto: ${DDL_AUTO:validate}
+
+brandx:
+  seed-data: false

@@ -1,0 +1,517 @@
+/*
+ * BrandX stylesheet.
+ *
+ * Hand-written and local rather than a CDN framework: no external request means the
+ * app renders identically offline and there is no third-party version to track while
+ * the requirements are still moving.
+ */
+
+:root {
+    --ink: #1c2230;
+    --ink-soft: #5a6478;
+    --line: #dfe3ea;
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --accent: #2f4fd8;
+    --accent-dark: #2740b5;
+    --ok-bg: #e7f6ec;
+    --ok-ink: #1c6b38;
+    --bad-bg: #fdeceb;
+    --bad-ink: #a12a22;
+    --radius: 7px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ---------- top bar ---------- */
+
+.topbar {
+    background: var(--ink);
+    color: #fff;
+}
+
+.topbar-inner {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    height: 56px;
+}
+
+.brand {
+    color: #fff;
+    text-decoration: none;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+}
+
+.brand span {
+    color: #8fa6ff;
+}
+
+.mainnav {
+    display: flex;
+    gap: 6px;
+}
+
+.mainnav a {
+    color: #c3c9d6;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    font-weight: 500;
+}
+
+.mainnav a:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: #fff;
+}
+
+.mainnav a.on {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+}
+
+/* ---------- page scaffolding ---------- */
+
+main.container {
+    padding-top: 26px;
+    padding-bottom: 48px;
+}
+
+.page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.page-head h1 {
+    margin: 0;
+    font-size: 25px;
+    letter-spacing: -0.3px;
+}
+
+.crumb {
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin: 0 0 4px;
+}
+
+.crumb a {
+    color: var(--ink-soft);
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+.panel h2 {
+    margin: 0 0 14px;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--ink-soft);
+}
+
+.footer {
+    border-top: 1px solid var(--line);
+    padding: 18px 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+/* ---------- dashboard tiles ---------- */
+
+.tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.tile {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.tile:hover {
+    border-color: var(--accent);
+}
+
+.tile-label {
+    color: var(--ink-soft);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.tile-value {
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    margin-top: 6px;
+}
+
+/* ---------- tables ---------- */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+}
+
+thead th {
+    background: #f0f2f6;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+}
+
+thead th a {
+    color: var(--ink-soft);
+    text-decoration: none;
+}
+
+thead th a:hover {
+    color: var(--accent);
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+tbody tr:hover {
+    background: #fafbfc;
+}
+
+td.num, th.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+td.actions {
+    text-align: right;
+    white-space: nowrap;
+}
+
+td.actions form {
+    display: inline;
+}
+
+.total-row td {
+    font-weight: 600;
+    background: #f0f2f6;
+}
+
+/* ---------- definition lists ---------- */
+
+.detail {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 10px 18px;
+    margin: 0;
+}
+
+.detail dt {
+    color: var(--ink-soft);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail dd {
+    margin: 0;
+}
+
+/* ---------- forms ---------- */
+
+.field {
+    margin-bottom: 16px;
+    max-width: 560px;
+}
+
+.field label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.field .hint {
+    color: var(--ink-soft);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+input[type=text],
+input[type=email],
+input[type=number],
+input[type=search],
+select,
+textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #c5cbd6;
+    border-radius: var(--radius);
+    font: inherit;
+    background: #fff;
+    color: var(--ink);
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: 2px solid rgba(47, 79, 216, 0.35);
+    outline-offset: 1px;
+    border-color: var(--accent);
+}
+
+textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.field-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.field-row .field {
+    flex: 1 1 220px;
+    max-width: none;
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.check input {
+    width: auto;
+}
+
+.field-error {
+    color: var(--bad-ink);
+    font-size: 13px;
+    margin: 5px 0 0;
+}
+
+.has-error input,
+.has-error select,
+.has-error textarea {
+    border-color: var(--bad-ink);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+}
+
+.search {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    max-width: 560px;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid #c5cbd6;
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    border-color: var(--ink-soft);
+}
+
+.btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #2740b5;
+    border-color: #2740b5;
+}
+
+.btn-danger {
+    color: var(--bad-ink);
+    border-color: #e3b5b1;
+}
+
+.btn-danger:hover {
+    background: var(--bad-bg);
+    border-color: var(--bad-ink);
+}
+
+.btn-small {
+    padding: 4px 10px;
+    font-size: 13px;
+}
+
+.btn-quiet {
+    border-color: transparent;
+    background: transparent;
+    color: var(--ink-soft);
+}
+
+.btn-quiet:hover {
+    background: #eceff4;
+    border-color: transparent;
+}
+
+/* ---------- alerts, pills, misc ---------- */
+
+.alert {
+    max-width: 1100px;
+    margin: 18px auto 0;
+    padding: 11px 16px;
+    border-radius: var(--radius);
+    font-weight: 500;
+}
+
+.alert-ok {
+    background: var(--ok-bg);
+    color: var(--ok-ink);
+    border: 1px solid #b6e0c4;
+}
+
+.alert-bad {
+    background: var(--bad-bg);
+    color: var(--bad-ink);
+    border: 1px solid #f0c3bf;
+}
+
+.pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 11px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border: 1px solid transparent;
+}
+
+.pill-on {
+    background: var(--ok-bg);
+    color: var(--ok-ink);
+    border-color: #b6e0c4;
+}
+
+.pill-off {
+    background: #eceff4;
+    color: var(--ink-soft);
+    border-color: var(--line);
+}
+
+.status-NEW {
+    background: #e8eeff;
+    color: #2740b5;
+    border-color: #bfcdf7;
+}
+
+.status-PAID {
+    background: var(--ok-bg);
+    color: var(--ok-ink);
+    border-color: #b6e0c4;
+}
+
+.status-SHIPPED {
+    background: #fff4e0;
+    color: #8a5a10;
+    border-color: #f0d8a8;
+}
+
+.status-DELIVERED {
+    background: #eceff4;
+    color: var(--ink-soft);
+    border-color: var(--line);
+}
+
+.status-CANCELLED {
+    background: var(--bad-bg);
+    color: var(--bad-ink);
+    border-color: #f0c3bf;
+}
+
+.empty {
+    background: var(--panel);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 34px;
+    text-align: center;
+    color: var(--ink-soft);
+}
+
+.pager {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.pager-state {
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+.muted {
+    color: var(--ink-soft);
+}
+
+a {
+    color: var(--accent);
+}
