@@ -9,12 +9,17 @@
 <main class="container">
     <p class="crumb"><a th:href="@{/orders}">Orders</a> / <span th:text="${order.orderNumber}">BX-…</span></p>
     <div class="page-head">
-        <h1 th:text="${order.orderNumber}">Order</h1>
+        <div class="page-title">
+            <span th:replace="~{fragments/layout :: badge-order}"></span>
+            <h1 th:text="${order.orderNumber}">Order</h1>
+        </div>
         <div style="display:flex; gap:10px">
-            <a class="btn" th:href="@{/orders/{id}/edit(id=${order.id})}">Edit</a>
+            <a class="btn" th:href="@{/orders/{id}/edit(id=${order.id})}">
+                <th:block th:replace="~{fragments/layout :: icon-edit}"></th:block> Edit</a>
             <form method="post" th:action="@{/orders/{id}/delete(id=${order.id})}"
                   onsubmit="return confirm('Delete this order and all of its line items?')">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger">
+                    <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Delete</button>
             </form>
         </div>
     </div>

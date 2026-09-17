@@ -51,12 +51,15 @@
         reindex();
     });
 
-    // Delegated so it also covers rows added after page load.
+    // Delegated so it also covers rows added after page load. `closest()` rather than
+    // checking `event.target` directly: the button now wraps an icon, so a click can
+    // land on that child element rather than the button itself.
     body.addEventListener('click', function (event) {
-        if (!event.target.classList.contains('js-remove-line')) {
+        var button = event.target.closest('.js-remove-line');
+        if (!button) {
             return;
         }
-        var row = event.target.closest('tr.line-row');
+        var row = button.closest('tr.line-row');
         if (row) {
             row.remove();
             reindex();

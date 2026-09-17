@@ -8,13 +8,18 @@
 
 <main class="container">
     <div class="page-head">
-        <h1>Customers</h1>
-        <a class="btn btn-primary" th:href="@{/customers/new}">New customer</a>
+        <div class="page-title">
+            <span th:replace="~{fragments/layout :: badge-customer}"></span>
+            <h1>Customers</h1>
+        </div>
+        <a class="btn btn-primary" th:href="@{/customers/new}">
+            <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New customer</a>
     </div>
 
     <form class="search" method="get" th:action="@{/customers}">
         <input type="search" name="search" th:value="${search}" placeholder="Search by name or email">
-        <button type="submit" class="btn">Search</button>
+        <button type="submit" class="btn">
+            <th:block th:replace="~{fragments/layout :: icon-search}"></th:block> Search</button>
         <a class="btn btn-quiet" th:if="${search}" th:href="@{/customers}">Clear</a>
     </form>
 
@@ -55,10 +60,12 @@
                     <span class="muted" th:unless="${customer.address != null and !#strings.isEmpty(customer.address.city)}">—</span>
                 </td>
                 <td class="actions">
-                    <a class="btn btn-small" th:href="@{/customers/{id}/edit(id=${customer.id})}">Edit</a>
+                    <a class="btn btn-small" th:href="@{/customers/{id}/edit(id=${customer.id})}">
+                        <th:block th:replace="~{fragments/layout :: icon-edit}"></th:block> Edit</a>
                     <form method="post" th:action="@{/customers/{id}/delete(id=${customer.id})}"
                           onsubmit="return confirm('Delete this customer? This cannot be undone.')">
-                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-small btn-danger">
+                            <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Delete</button>
                     </form>
                 </td>
             </tr>

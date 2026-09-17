@@ -26,10 +26,19 @@
 <header class="topbar" th:fragment="topbar(active)">
     <div class="container topbar-inner">
         <a class="brand" th:href="@{/}">Brand<span>X</span></a>
+        <!--
+          Icons here are plain (`icon-product` etc.), not the tinted `.icon-badge`
+          versions used elsewhere: a pastel badge would wash out against the dark
+          topbar, so nav icons just inherit the link's own text color instead, the
+          same way the link's text already does.
+        -->
         <nav class="mainnav">
-            <a th:href="@{/products}" th:classappend="${active == 'products'} ? 'on'">Products</a>
-            <a th:href="@{/orders}" th:classappend="${active == 'orders'} ? 'on'">Orders</a>
-            <a th:href="@{/customers}" th:classappend="${active == 'customers'} ? 'on'">Customers</a>
+            <a th:href="@{/products}" th:classappend="${active == 'products'} ? 'on'">
+                <th:block th:replace="~{fragments/layout :: icon-product}"></th:block> Products</a>
+            <a th:href="@{/orders}" th:classappend="${active == 'orders'} ? 'on'">
+                <th:block th:replace="~{fragments/layout :: icon-order}"></th:block> Orders</a>
+            <a th:href="@{/customers}" th:classappend="${active == 'customers'} ? 'on'">
+                <th:block th:replace="~{fragments/layout :: icon-customer}"></th:block> Customers</a>
         </nav>
     </div>
 </header>
@@ -56,6 +65,80 @@
 <footer class="footer" th:fragment="footer">
     <div class="container">BrandX · Spring Boot 4 · Java 21</div>
 </footer>
+
+<!--
+  Icon set. One outline style throughout (24x24, ~1.75 stroke, round caps/joins,
+  `currentColor`) so every icon inherits its color from context instead of hard-coding
+  one — plain in nav links and buttons, or wrapped below in a tinted `.icon-badge` next
+  to page titles and dashboard tiles. Hand-drawn rather than an icon-font/CDN import,
+  consistent with this app having no external asset dependencies.
+-->
+
+<svg th:fragment="icon-product" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3Z"/>
+    <path d="M4 7.5 12 12l8-4.5"/>
+    <path d="M12 12v9"/>
+</svg>
+
+<svg th:fragment="icon-order" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="2.5" width="6" height="3" rx="1"/>
+    <rect x="5" y="4" width="14" height="17" rx="2"/>
+    <path d="m9 12.5 2 2 4-4.5"/>
+</svg>
+
+<svg th:fragment="icon-customer" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="8" r="3.5"/>
+    <path d="M5 20c0-4.1 3.1-7 7-7s7 2.9 7 7"/>
+</svg>
+
+<svg th:fragment="icon-plus" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 5v14M5 12h14"/>
+</svg>
+
+<svg th:fragment="icon-edit" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14.5 4.5a2.1 2.1 0 0 1 3 3L7 18l-4 1 1-4Z"/>
+    <path d="M13 6l3 3"/>
+</svg>
+
+<svg th:fragment="icon-trash" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 7h16"/>
+    <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+    <path d="M18.5 7 17.6 19a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5.5 7Z"/>
+    <path d="M10 11v6M14 11v6"/>
+</svg>
+
+<svg th:fragment="icon-check" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 12.5 9.5 18 20 6"/>
+</svg>
+
+<svg th:fragment="icon-search" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="10.5" cy="10.5" r="6.5"/>
+    <path d="m20 20-4.8-4.8"/>
+</svg>
+
+<!--
+  Entity badges: same icon, wrapped in the color-coded square each entity keeps
+  everywhere it appears (nav is the one exception — see the comment on `topbar` above).
+-->
+<span th:fragment="badge-product" class="icon-badge icon-badge-product">
+    <th:block th:replace="~{fragments/layout :: icon-product}"></th:block>
+</span>
+
+<span th:fragment="badge-order" class="icon-badge icon-badge-order">
+    <th:block th:replace="~{fragments/layout :: icon-order}"></th:block>
+</span>
+
+<span th:fragment="badge-customer" class="icon-badge icon-badge-customer">
+    <th:block th:replace="~{fragments/layout :: icon-customer}"></th:block>
+</span>
 
 </body>
 </html>

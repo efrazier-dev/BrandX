@@ -10,7 +10,10 @@
     <p class="crumb"><a th:href="@{/orders}">Orders</a> /
         <span th:text="${orderForm.id} == null ? 'New' : ${orderForm.orderNumber}">New</span></p>
     <div class="page-head">
-        <h1 th:text="${orderForm.id} == null ? 'New order' : 'Edit order ' + ${orderForm.orderNumber}">New order</h1>
+        <div class="page-title">
+            <span th:replace="~{fragments/layout :: badge-order}"></span>
+            <h1 th:text="${orderForm.id} == null ? 'New order' : 'Edit order ' + ${orderForm.orderNumber}">New order</h1>
+        </div>
     </div>
 
     <form method="post" th:object="${orderForm}"
@@ -93,7 +96,8 @@
                            th:errors="*{items[__${stat.index}__].quantity}"></p>
                     </td>
                     <td class="actions">
-                        <button type="button" class="btn btn-small btn-danger js-remove-line">Remove</button>
+                        <button type="button" class="btn btn-small btn-danger js-remove-line">
+                            <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Remove</button>
                     </td>
                 </tr>
                 </tbody>
@@ -104,7 +108,8 @@
             </p>
 
             <div style="margin-top:14px">
-                <button type="button" class="btn" id="add-line">Add line</button>
+                <button type="button" class="btn" id="add-line">
+                    <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> Add line</button>
             </div>
 
             <p class="hint" style="margin-top:12px">
@@ -114,8 +119,10 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary"
-                    th:text="${orderForm.id} == null ? 'Create order' : 'Save changes'">Create order
+            <button type="submit" class="btn btn-primary">
+                <th:block th:if="${orderForm.id} == null" th:replace="~{fragments/layout :: icon-plus}"></th:block>
+                <th:block th:unless="${orderForm.id} == null" th:replace="~{fragments/layout :: icon-check}"></th:block>
+                <span th:text="${orderForm.id} == null ? 'Create order' : 'Save changes'">Create order</span>
             </button>
             <a class="btn btn-quiet"
                th:href="${orderForm.id} == null ? @{/orders} : @{/orders/{id}(id=${orderForm.id})}">Cancel</a>
@@ -141,7 +148,8 @@
                 <input type="number" min="1" name="items[__INDEX__].quantity" value="1">
             </td>
             <td class="actions">
-                <button type="button" class="btn btn-small btn-danger js-remove-line">Remove</button>
+                <button type="button" class="btn btn-small btn-danger js-remove-line">
+                    <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Remove</button>
             </td>
         </tr>
     </template>

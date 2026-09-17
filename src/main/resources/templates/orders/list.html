@@ -8,13 +8,18 @@
 
 <main class="container">
     <div class="page-head">
-        <h1>Orders</h1>
-        <a class="btn btn-primary" th:href="@{/orders/new}">New order</a>
+        <div class="page-title">
+            <span th:replace="~{fragments/layout :: badge-order}"></span>
+            <h1>Orders</h1>
+        </div>
+        <a class="btn btn-primary" th:href="@{/orders/new}">
+            <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New order</a>
     </div>
 
     <form class="search" method="get" th:action="@{/orders}">
         <input type="search" name="search" th:value="${search}" placeholder="Search by order number or customer">
-        <button type="submit" class="btn">Search</button>
+        <button type="submit" class="btn">
+            <th:block th:replace="~{fragments/layout :: icon-search}"></th:block> Search</button>
         <a class="btn btn-quiet" th:if="${search}" th:href="@{/orders}">Clear</a>
     </form>
 
@@ -59,10 +64,12 @@
                     th:text="${totals[order.id]} != null
                         ? ${#numbers.formatDecimal(totals[order.id], 1, 'COMMA', 2, 'POINT')} : '0.00'">0.00</td>
                 <td class="actions">
-                    <a class="btn btn-small" th:href="@{/orders/{id}/edit(id=${order.id})}">Edit</a>
+                    <a class="btn btn-small" th:href="@{/orders/{id}/edit(id=${order.id})}">
+                        <th:block th:replace="~{fragments/layout :: icon-edit}"></th:block> Edit</a>
                     <form method="post" th:action="@{/orders/{id}/delete(id=${order.id})}"
                           onsubmit="return confirm('Delete this order and all of its line items?')">
-                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-small btn-danger">
+                            <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Delete</button>
                     </form>
                 </td>
             </tr>

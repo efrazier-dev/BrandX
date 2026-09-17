@@ -9,12 +9,17 @@
 <main class="container">
     <p class="crumb"><a th:href="@{/products}">Products</a> / <span th:text="${product.sku}">SKU</span></p>
     <div class="page-head">
-        <h1 th:text="${product.name}">Product</h1>
+        <div class="page-title">
+            <span th:replace="~{fragments/layout :: badge-product}"></span>
+            <h1 th:text="${product.name}">Product</h1>
+        </div>
         <div style="display:flex; gap:10px">
-            <a class="btn" th:href="@{/products/{id}/edit(id=${product.id})}">Edit</a>
+            <a class="btn" th:href="@{/products/{id}/edit(id=${product.id})}">
+                <th:block th:replace="~{fragments/layout :: icon-edit}"></th:block> Edit</a>
             <form method="post" th:action="@{/products/{id}/delete(id=${product.id})}"
                   onsubmit="return confirm('Delete this product? This cannot be undone.')">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger">
+                    <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Delete</button>
             </form>
         </div>
     </div>

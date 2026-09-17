@@ -10,7 +10,10 @@
     <p class="crumb"><a th:href="@{/customers}">Customers</a> /
         <span th:text="${customer.id} == null ? 'New' : ${customer.fullName}">New</span></p>
     <div class="page-head">
-        <h1 th:text="${customer.id} == null ? 'New customer' : 'Edit customer'">New customer</h1>
+        <div class="page-title">
+            <span th:replace="~{fragments/layout :: badge-customer}"></span>
+            <h1 th:text="${customer.id} == null ? 'New customer' : 'Edit customer'">New customer</h1>
+        </div>
     </div>
 
     <form method="post" th:object="${customer}"
@@ -97,8 +100,10 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary"
-                    th:text="${customer.id} == null ? 'Create customer' : 'Save changes'">Create customer
+            <button type="submit" class="btn btn-primary">
+                <th:block th:if="${customer.id} == null" th:replace="~{fragments/layout :: icon-plus}"></th:block>
+                <th:block th:unless="${customer.id} == null" th:replace="~{fragments/layout :: icon-check}"></th:block>
+                <span th:text="${customer.id} == null ? 'Create customer' : 'Save changes'">Create customer</span>
             </button>
             <a class="btn btn-quiet"
                th:href="${customer.id} == null ? @{/customers} : @{/customers/{id}(id=${customer.id})}">Cancel</a>

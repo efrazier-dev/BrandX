@@ -8,13 +8,18 @@
 
 <main class="container">
     <div class="page-head">
-        <h1>Products</h1>
-        <a class="btn btn-primary" th:href="@{/products/new}">New product</a>
+        <div class="page-title">
+            <span th:replace="~{fragments/layout :: badge-product}"></span>
+            <h1>Products</h1>
+        </div>
+        <a class="btn btn-primary" th:href="@{/products/new}">
+            <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New product</a>
     </div>
 
     <form class="search" method="get" th:action="@{/products}">
         <input type="search" name="search" th:value="${search}" placeholder="Search by name or SKU">
-        <button type="submit" class="btn">Search</button>
+        <button type="submit" class="btn">
+            <th:block th:replace="~{fragments/layout :: icon-search}"></th:block> Search</button>
         <a class="btn btn-quiet" th:if="${search}" th:href="@{/products}">Clear</a>
     </form>
 
@@ -51,10 +56,12 @@
                           th:text="${product.active} ? 'Active' : 'Inactive'">Active</span>
                 </td>
                 <td class="actions">
-                    <a class="btn btn-small" th:href="@{/products/{id}/edit(id=${product.id})}">Edit</a>
+                    <a class="btn btn-small" th:href="@{/products/{id}/edit(id=${product.id})}">
+                        <th:block th:replace="~{fragments/layout :: icon-edit}"></th:block> Edit</a>
                     <form method="post" th:action="@{/products/{id}/delete(id=${product.id})}"
                           onsubmit="return confirm('Delete this product? This cannot be undone.')">
-                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-small btn-danger">
+                            <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Delete</button>
                     </form>
                 </td>
             </tr>

@@ -9,12 +9,17 @@
 <main class="container">
     <p class="crumb"><a th:href="@{/customers}">Customers</a> / <span th:text="${customer.fullName}">Name</span></p>
     <div class="page-head">
-        <h1 th:text="${customer.fullName}">Customer</h1>
+        <div class="page-title">
+            <span th:replace="~{fragments/layout :: badge-customer}"></span>
+            <h1 th:text="${customer.fullName}">Customer</h1>
+        </div>
         <div style="display:flex; gap:10px">
-            <a class="btn" th:href="@{/customers/{id}/edit(id=${customer.id})}">Edit</a>
+            <a class="btn" th:href="@{/customers/{id}/edit(id=${customer.id})}">
+                <th:block th:replace="~{fragments/layout :: icon-edit}"></th:block> Edit</a>
             <form method="post" th:action="@{/customers/{id}/delete(id=${customer.id})}"
                   onsubmit="return confirm('Delete this customer? This cannot be undone.')">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger">
+                    <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Delete</button>
             </form>
         </div>
     </div>

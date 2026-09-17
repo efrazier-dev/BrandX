@@ -13,14 +13,17 @@
 
     <div class="tiles">
         <a class="tile" th:href="@{/products}">
+            <div class="tile-icon"><span th:replace="~{fragments/layout :: badge-product}"></span></div>
             <div class="tile-label">Products</div>
             <div class="tile-value" th:text="${productCount}">0</div>
         </a>
         <a class="tile" th:href="@{/orders}">
+            <div class="tile-icon"><span th:replace="~{fragments/layout :: badge-order}"></span></div>
             <div class="tile-label">Orders</div>
             <div class="tile-value" th:text="${orderCount}">0</div>
         </a>
         <a class="tile" th:href="@{/customers}">
+            <div class="tile-icon"><span th:replace="~{fragments/layout :: badge-customer}"></span></div>
             <div class="tile-label">Customers</div>
             <div class="tile-value" th:text="${customerCount}">0</div>
         </a>
@@ -34,9 +37,12 @@
             create, view, edit and delete.
         </p>
         <div class="form-actions" style="border-top:0; padding-top:0; margin-top:14px">
-            <a class="btn btn-primary" th:href="@{/orders/new}">New order</a>
-            <a class="btn" th:href="@{/products/new}">New product</a>
-            <a class="btn" th:href="@{/customers/new}">New customer</a>
+            <a class="btn btn-primary" th:href="@{/orders/new}">
+                <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New order</a>
+            <a class="btn" th:href="@{/products/new}">
+                <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New product</a>
+            <a class="btn" th:href="@{/customers/new}">
+                <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New customer</a>
         </div>
     </div>
 </main>
