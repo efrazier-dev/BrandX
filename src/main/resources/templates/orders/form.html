@@ -120,8 +120,8 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">
-                <th:block th:if="${orderForm.id} == null" th:replace="~{fragments/layout :: icon-plus}"></th:block>
-                <th:block th:unless="${orderForm.id} == null" th:replace="~{fragments/layout :: icon-check}"></th:block>
+                <span th:if="${orderForm.id} == null"><th:block th:replace="~{fragments/layout :: icon-plus}"></th:block></span>
+                <span th:unless="${orderForm.id} == null"><th:block th:replace="~{fragments/layout :: icon-check}"></th:block></span>
                 <span th:text="${orderForm.id} == null ? 'Create order' : 'Save changes'">Create order</span>
             </button>
             <a class="btn btn-quiet"

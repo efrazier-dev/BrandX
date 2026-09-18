@@ -75,8 +75,8 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">
-                <th:block th:if="${product.id} == null" th:replace="~{fragments/layout :: icon-plus}"></th:block>
-                <th:block th:unless="${product.id} == null" th:replace="~{fragments/layout :: icon-check}"></th:block>
+                <span th:if="${product.id} == null"><th:block th:replace="~{fragments/layout :: icon-plus}"></th:block></span>
+                <span th:unless="${product.id} == null"><th:block th:replace="~{fragments/layout :: icon-check}"></th:block></span>
                 <span th:text="${product.id} == null ? 'Create product' : 'Save changes'">Create product</span>
             </button>
             <a class="btn btn-quiet"

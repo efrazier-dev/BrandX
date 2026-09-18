@@ -101,8 +101,8 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">
-                <th:block th:if="${customer.id} == null" th:replace="~{fragments/layout :: icon-plus}"></th:block>
-                <th:block th:unless="${customer.id} == null" th:replace="~{fragments/layout :: icon-check}"></th:block>
+                <span th:if="${customer.id} == null"><th:block th:replace="~{fragments/layout :: icon-plus}"></th:block></span>
+                <span th:unless="${customer.id} == null"><th:block th:replace="~{fragments/layout :: icon-check}"></th:block></span>
                 <span th:text="${customer.id} == null ? 'Create customer' : 'Save changes'">Create customer</span>
             </button>
             <a class="btn btn-quiet"

@@ -50,9 +50,21 @@ public class CustomerService {
         return orders.countByCustomerId(customerId);
     }
 
+    /**
+     * Copies the editable fields onto a fresh entity rather than saving the
+     * request-bound instance directly: the create form round-trips a hidden {@code id},
+     * and {@code SimpleJpaRepository.save} treats any non-null id as a merge, which
+     * would let a crafted POST overwrite an arbitrary existing row.
+     */
     @Transactional
-    public Customer create(Customer customer) {
-        requireUniqueEmail(customer.getEmail(), null);
+    public Customer create(Customer submitted) {
+        requireUniqueEmail(submitted.getEmail(), null);
+        Customer customer = new Customer();
+        customer.setFirstName(submitted.getFirstName());
+        customer.setLastName(submitted.getLastName());
+        customer.setEmail(submitted.getEmail());
+        customer.setPhone(submitted.getPhone());
+        customer.setAddress(submitted.getAddress());
         return customers.save(customer);
     }
 

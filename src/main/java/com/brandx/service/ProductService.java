@@ -44,9 +44,22 @@ public class ProductService {
         return products.count();
     }
 
+    /**
+     * Copies the editable fields onto a fresh entity rather than saving the
+     * request-bound instance directly: the create form round-trips a hidden {@code id},
+     * and {@code SimpleJpaRepository.save} treats any non-null id as a merge, which
+     * would let a crafted POST overwrite an arbitrary existing row.
+     */
     @Transactional
-    public Product create(Product product) {
-        requireUniqueSku(product.getSku(), null);
+    public Product create(Product submitted) {
+        requireUniqueSku(submitted.getSku(), null);
+        Product product = new Product();
+        product.setSku(submitted.getSku());
+        product.setName(submitted.getName());
+        product.setDescription(submitted.getDescription());
+        product.setPrice(submitted.getPrice());
+        product.setStockQuantity(submitted.getStockQuantity());
+        product.setActive(submitted.isActive());
         return products.save(product);
     }
 
