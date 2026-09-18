@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Claude Code ###
+# Shared agents/commands are tracked; per-developer permissions are not.
+.claude/settings.local.json
