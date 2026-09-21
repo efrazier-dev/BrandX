@@ -15,15 +15,17 @@ example to avoid.
 
 ## Service layer — `create()` must never trust a submitted id
 
-**Copy:** `OrderService.create`/`applyForm` (`src/main/java/com/brandx/service/OrderService.java`)
-or `ProductService.update` (`ProductService.java:59-68`) — both build/mutate a
-**managed** entity and copy only whitelisted fields onto it.
+**Copy:** `OrderService.create`/`applyForm` (`src/main/java/com/brandx/service/OrderService.java`),
+or `ProductService.create`/`update` and `CustomerService.create`/`update` — every
+`create()`/`update()` in this codebase builds/mutates a **managed** entity and copies
+only whitelisted fields onto it, never saving the request-bound instance directly.
 
-**Do not copy:** `ProductService.create` / `CustomerService.create`, which call
-`repository.save(entityBoundFromTheRequest)` directly. Because the create form
-round-trips a hidden `id` field, `SimpleJpaRepository.save` treats a non-null id as a
-merge, letting a POST to the create endpoint overwrite an arbitrary existing row. This
-is the review's top finding — do not reproduce it in a new entity.
+**Why this matters:** the create forms round-trip a hidden `id` field, and
+`SimpleJpaRepository.save` treats a non-null id as a merge — saving a request-bound
+entity directly in `create()` would let a POST to the create endpoint overwrite an
+arbitrary existing row. This was the 2026-09-18 review's top finding (since fixed in
+`ProductService`/`CustomerService`); do not reintroduce it by having a new entity's
+`create()` save the bound instance directly.
 
 Rule for the new `<Entity>Service.create(...)`:
 - If the entity has non-trivial relationships or a variable-length collection (like
@@ -56,11 +58,14 @@ to `fragments/layout.html` alongside the existing ones, and reference them with
 (the review's performance finding: duplicated inline SVG paths bloat every row by
 ~1.3KB).
 
-**Do not copy the double-icon bug** from `products/form.html:78-79` (and the
-`customers`/`orders` equivalents). Thymeleaf evaluates `th:replace` *before*
+**Watch for the double-icon bug**, already fixed in `products/form.html`,
+`customers/form.html`, and `orders/form.html` (see each template's submit button, where
+the `icon-plus`/`icon-check` pair is wrapped in `<span th:if>`/`<span th:unless>`) but
+easy to reintroduce in a new template. Thymeleaf evaluates `th:replace` *before*
 `th:if`/`th:unless` (inclusion is precedence order 1, conditionals are order 3), so
 putting the condition directly on the same element as `th:replace` gets discarded and
-**both** icons render. Always put the condition on a wrapping element instead:
+**both** icons render. Always put the condition on a wrapping element instead, matching
+the existing three templates:
 
 ```html
 <span th:if="${entity.id} == null"><th:block th:replace="~{fragments/layout :: icon-plus}"></th:block></span>
