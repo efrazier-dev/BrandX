@@ -73,13 +73,27 @@ the existing three templates:
 ```
 
 **Delete forms:** keep them as real `<form method="post">` POSTs (never a GET link),
-matching `products/list.html:61-65`. `onsubmit="return confirm(...)"` is a UX
-courtesy only — it does not run on a cross-site auto-submitted POST — so it is not a
-CSRF control. There is no Spring Security / CSRF filter in this project yet (a
-separate, tracked gap); don't invent a one-off token mechanism for just the new
-entity. If CSRF protection is added later, the fix must land in `fragments/layout.html`
-or a shared delete-button fragment so it covers every entity's delete forms at once,
-not entity-by-entity.
+matching `products/list.html`. `onsubmit="return confirm(...)"` is a UX courtesy only —
+it is not a security control. CSRF protection is on (Spring Security), and the token
+arrives automatically **because the form uses `th:action`**. A plain `action="/..."`
+gets no token and the POST is rejected with 403, so always write `th:action`. Never add
+a one-off token mechanism for the new entity, and never `csrf().disable()`.
+
+**Authorization on the new stack.** Two separate things, and the scaffold needs both:
+
+1. `@PreAuthorize` on the new **service**'s mutating methods — this is the enforcement.
+   Match the existing split: `hasRole('ADMIN')` for create/update/delete, unless the new
+   entity is order-like day-to-day work, in which case `hasAnyRole('ADMIN', 'STAFF')`
+   for create/update with delete still ADMIN-only. Reads stay unannotated; the filter
+   chain already requires a signed-in user.
+2. `sec:authorize` on the new templates' New/Edit/Delete controls — this only hides
+   them. Add `xmlns:sec="http://www.thymeleaf.org/extras/spring-security"` to the
+   `<html>` tag of any template that uses it. In a list table, guard the whole
+   `<td class="actions">` and add an empty `<td class="actions" sec:authorize="!hasRole('ADMIN')">`
+   beside it so the row keeps the header's cell count.
+
+A new stack with only the template guards looks correct in a browser and is wide open to
+curl. Verify with the seeded `staff` account, not just `admin`.
 
 ## After scaffolding
 

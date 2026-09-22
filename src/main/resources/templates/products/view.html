@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head(${product.name})}"></head>
 <body>
 <header th:replace="~{fragments/layout :: topbar('products')}"></header>
@@ -13,7 +14,7 @@
             <span th:replace="~{fragments/layout :: badge-product}"></span>
             <h1 th:text="${product.name}">Product</h1>
         </div>
-        <div style="display:flex; gap:10px">
+        <div style="display:flex; gap:10px" sec:authorize="hasRole('ADMIN')">
             <a class="btn" th:href="@{/products/{id}/edit(id=${product.id})}">
                 <th:block th:replace="~{fragments/layout :: icon-edit}"></th:block> Edit</a>
             <form method="post" th:action="@{/products/{id}/delete(id=${product.id})}"

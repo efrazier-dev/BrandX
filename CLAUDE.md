@@ -12,11 +12,17 @@ no REST API, no JS framework, and no build step beyond Maven; pages are classic
 GET-render / POST-redirect flows with a small amount of vanilla JS for dynamic order
 line rows (`static/js/order-lines.js`).
 
-**There is no Spring Security on the classpath and no `SecurityFilterChain` anywhere.**
-Nothing is authenticated, authorized, or CSRF-protected today. Every state-changing
-route is a public, tokenless POST. This is a known, accepted gap in the current stage of
-the project — do not treat it as a fresh discovery, but do flag it in review when a
-change lands directly on an unprotected path.
+**Authentication is form login against a local `app_users` table, with two roles.**
+Every screen requires a signed-in user; `ADMIN` may change anything, `STAFF` may read
+everything and create or edit orders. This is a proof-of-concept front door, chosen
+because it is the cheapest one that exercises the role model — the intended path is
+OIDC/SSO later, which replaces `formLogin()` and leaves the roles, the `@PreAuthorize`
+annotations and the `sec:authorize` guards in place. See `config/SecurityConfig.java`.
+
+Accounts exist only so role checks have something to resolve against: there is no
+controller, service or screen for managing them, and the only accounts anywhere come
+from `DevUserSeeder` on the dev profile. **Provisioning a first account outside dev is
+unsolved** — flag it if a change starts to depend on real user management.
 
 ## Commands
 
@@ -32,6 +38,11 @@ $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
 
 Serves on http://localhost:8080. Records created while testing vanish on restart (H2 is
 in-memory).
+
+Every screen needs a sign-in. The dev profile seeds two throwaway accounts:
+`admin`/`admin` (full access) and `staff`/`staff` (read everything, plus create and edit
+orders). Use `staff` when checking that a change is correctly hidden *and* refused —
+hiding a control and refusing the POST behind it are separate mechanisms.
 
 ```powershell
 .\mvnw.cmd test                              # full test suite
@@ -82,7 +93,26 @@ doesn't exist" flow through a global handler into a dedicated error view. Except
 represent a business-rule refusal (duplicate value, entity still in use) are instead
 caught locally in the controller and surfaced as a flash message or a field-level
 validation error — because those belong back on the screen the user was already on, not
-on a separate error page.
+on a separate error page. An authorization refusal is a third case with its own view
+(`access-denied.html`), kept distinct from not-found so a 403 never implies the record
+is missing.
+
+**Authorization is enforced at the service layer, not the controller or the template.**
+`@PreAuthorize` sits on the service methods because that is the transactional boundary —
+a second controller or a future REST endpoint reaching the same method is checked too.
+The `sec:authorize` attributes in the templates only hide controls; they are
+presentation, and a review should treat a guard that exists *only* in a template as
+missing. Note the consequence for testing: MockMvc records the forward to
+`/access-denied` without executing it, so a status assertion alone can pass while the
+real container returns 405 — `AuthController.accessDenied` is deliberately mapped
+without an HTTP method restriction because the forward preserves the original POST.
+
+**Users are loaded with their roles eagerly, for the same reason as everything else
+above.** Authentication runs in a servlet filter, outside any transaction, and the
+`UserDetails` it produces is held in the session — so `AppUserRepository` attaches an
+`@EntityGraph` to the login lookup and `AppUserDetailsService` converts roles to
+authorities before returning. Anything lazy there fails at the first authorization check,
+not at login.
 
 **Shared UI conventions:** list-screen sort/search state round-trips through the URL
 rather than the session; templates share a common layout fragment (nav, alerts,

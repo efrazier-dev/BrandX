@@ -6,7 +6,8 @@
   is a separate dependency, and `th:replace` covers a handful of screens perfectly
   well. Each page is a complete document that pulls these pieces in.
 -->
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
@@ -40,6 +41,23 @@
             <a th:href="@{/customers}" th:classappend="${active == 'customers'} ? 'on'">
                 <th:block th:replace="~{fragments/layout :: icon-customer}"></th:block> Customers</a>
         </nav>
+
+        <!--
+          Every screen that renders this bar is behind authentication, so there is no
+          signed-out variant to handle. The role chip is informational; it is not what
+          enforces anything (see the @PreAuthorize annotations on the services).
+        -->
+        <div class="topbar-user" sec:authorize="isAuthenticated()">
+            <span class="who">
+                <span class="who-name" sec:authentication="name">user</span>
+                <span class="who-role" sec:authorize="hasRole('ADMIN')">Admin</span>
+                <span class="who-role" sec:authorize="!hasRole('ADMIN')">Staff</span>
+            </span>
+            <!-- POST, because Spring Security only accepts a POST to /logout. -->
+            <form method="post" th:action="@{/logout}">
+                <button type="submit" class="btn btn-small btn-logout">Sign out</button>
+            </form>
+        </div>
     </div>
 </header>
 

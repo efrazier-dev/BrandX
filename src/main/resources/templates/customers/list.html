@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Customers')}"></head>
 <body>
 <header th:replace="~{fragments/layout :: topbar('customers')}"></header>
@@ -12,7 +13,7 @@
             <span th:replace="~{fragments/layout :: badge-customer}"></span>
             <h1>Customers</h1>
         </div>
-        <a class="btn btn-primary" th:href="@{/customers/new}">
+        <a class="btn btn-primary" th:href="@{/customers/new}" sec:authorize="hasRole('ADMIN')">
             <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New customer</a>
     </div>
 
@@ -59,7 +60,7 @@
                           th:text="${customer.address.city + (#strings.isEmpty(customer.address.state) ? '' : ', ' + customer.address.state)}">—</span>
                     <span class="muted" th:unless="${customer.address != null and !#strings.isEmpty(customer.address.city)}">—</span>
                 </td>
-                <td class="actions">
+                <td class="actions" sec:authorize="hasRole('ADMIN')">
                     <a class="btn btn-small" th:href="@{/customers/{id}/edit(id=${customer.id})}">
                         <th:block th:replace="~{fragments/layout :: icon-edit}"></th:block> Edit</a>
                     <form method="post" th:action="@{/customers/{id}/delete(id=${customer.id})}"
@@ -68,6 +69,8 @@
                             <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Delete</button>
                     </form>
                 </td>
+                <!-- Keeps the row's cell count matching the header for non-admins. -->
+                <td class="actions" sec:authorize="!hasRole('ADMIN')"></td>
             </tr>
             </tbody>
         </table>

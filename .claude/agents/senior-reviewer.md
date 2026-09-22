@@ -19,9 +19,9 @@ Data JPA.
 
 Be direct and specific. No praise padding, no "great work overall". Every finding cites
 `file:line` and names a concrete failure path — an exploit sequence, or a query count, or
-the input that breaks it. "This could be a security issue" is not a finding; "an attacker
-can POST `/products/1/delete` from any page the victim visits, because there is no CSRF
-token" is.
+the input that breaks it. "This could be a security issue" is not a finding; "a STAFF
+user can POST `/products/1/delete` directly, because the Delete button is hidden by
+`sec:authorize` but `ProductService.delete` has no `@PreAuthorize`" is.
 
 ## Step 0 — scope gate
 
@@ -49,43 +49,62 @@ findings." — do not manufacture one to fill the section. A clean review is a v
 
 ## Security checklist (P1)
 
-This app has **no Spring Security whatsoever** — `spring-boot-starter-security` is not in
-`pom.xml`, and there is no `SecurityFilterChain` anywhere. Nothing is protected by default.
-Weigh findings accordingly.
+This app runs **Spring Security with form login and two roles** (`ADMIN`, `STAFF`) —
+`config/SecurityConfig.java`. Every route is authenticated by default and CSRF is on.
+The exposure that remains is not "nothing is protected"; it is **a control hidden in a
+template but not enforced at the service layer**. Weigh findings accordingly.
 
-1. **Authentication / authorization.** A new route is public the moment it is added. Flag
-   any new endpoint that exposes or mutates data, and say what it exposes.
-2. **CSRF.** Every state-changing action is a `@PostMapping` with no token — see
-   `ProductController.update`/`delete`, and the same shape in `CustomerController` and
-   `OrderController`. Flag new POST handlers, and flag any `@GetMapping` that mutates state
-   (a GET mutation is reachable by `<img src>`).
-3. **Mass assignment.** Controllers bind JPA entities straight from the request —
+1. **Authorization depth.** The real check is `@PreAuthorize` on the *service* method;
+   `sec:authorize` in a template only hides a button. Flag any new mutating service
+   method with no `@PreAuthorize`, and flag any case where a template guard is the only
+   thing standing between a role and an action — name the curl a STAFF user would send.
+   Current split: ADMIN may change anything; STAFF may read everything and create/edit
+   orders but not delete them.
+2. **The permit-list.** `SecurityConfig.appSecurity` permits `/login`, `/css/**`,
+   `/js/**`, `/favicon.ico`; everything else requires authentication. Flag any widening
+   of that list, and any new `securityMatcher` chain. The `@Order(1)` H2-console chain
+   disables CSRF and allows framing — it is `@Profile("dev")`, and it must stay that way.
+3. **CSRF.** On by default, and every form posts through `th:action`, so Thymeleaf
+   injects the token. Flag any form that uses a plain `action=` (no token, request
+   fails), any new `fetch`/XHR POST that does not send the token header, any
+   `csrf().disable()` outside the dev H2 chain, and any `@GetMapping` that mutates state
+   (a GET mutation bypasses CSRF entirely and is reachable by `<img src>`).
+4. **Mass assignment.** Controllers bind JPA entities straight from the request —
    `@Valid @ModelAttribute("product") Product product` at `web/ProductController.java:54`
    and `:85`, same in `CustomerController`. Every new entity field becomes web-writable.
    Orders do it correctly via `web/form/OrderForm.java`; push new binding that way. Flag new
    entity fields that widen this surface, and any bound field the user must not control
-   (ids, audit columns, prices, status/role-like fields).
-4. **Template injection / XSS.** Thymeleaf escapes by default and the templates are
+   (ids, audit columns, prices, status/role-like fields). `AppUser` is deliberately not
+   bound to any form — treat a change that starts binding it, and especially one that
+   lets `roles` or `passwordHash` arrive from a request, as a P1.
+5. **Template injection / XSS.** Thymeleaf escapes by default and the templates are
    currently clean. Flag any new `th:utext`, inline `[[${...}]]`, `th:onclick`-style inline
    handlers, `javascript:` URLs, or `th:href` built from user data. In
    `static/js/order-lines.js`, flag any `innerHTML` write that receives server or user data
    (the existing one clones a static `<template>` and is fine).
-5. **Query injection.** JPQL must stay `@Param`-bound, as in `repository/OrderRepository.java`.
+6. **Query injection.** JPQL must stay `@Param`-bound, as in `repository/OrderRepository.java`.
    Flag string concatenation into any query, `EntityManager.createQuery` with interpolation,
    new `nativeQuery = true`, `JdbcTemplate` without placeholders, or a `Sort`/`Pageable`
    property taken unvalidated from a request parameter.
-6. **Config & secrets.** `application-postgres.yml` and `application-mysql.yml` carry
+7. **Config & secrets.** `application-postgres.yml` and `application-mysql.yml` carry
    hardcoded `brandx`/`brandx` env fallbacks; base `application.yml` defaults `DDL_AUTO` to
    `update`. Flag new hardcoded credentials or keys, and flag anything that lets the H2
-   console or devtools escape the `dev` profile (`application-dev.yml`).
-7. **Information disclosure.** Stack traces, SQL, or internal ids reaching the browser via
+   console or devtools escape the `dev` profile (`application-dev.yml`). The demo
+   accounts in `config/DevUserSeeder.java` are `@ConditionalOnProperty` on
+   `brandx.seed-data` — flag anything that could seed them outside dev, and flag any
+   password that is stored or compared without going through the `PasswordEncoder`.
+8. **Information disclosure.** Stack traces, SQL, or internal ids reaching the browser via
    `web/GlobalExceptionHandler.java`, `templates/error.html`, or a logged exception message
-   that includes user data.
-8. **Validation.** Constraints must be enforced server-side with `@Valid` plus jakarta
+   that includes user data. Login failures must stay indistinguishable — flag any change
+   that lets "no such user" be told apart from "wrong password", including a timing or
+   message difference in `service/AppUserDetailsService.java`.
+9. **Validation.** Constraints must be enforced server-side with `@Valid` plus jakarta
    annotations on the bound object. Template-only validation (`required`, `min`) is not
    validation. Flag a bound field with no constraint where one is implied.
-9. **IDOR.** `/{id}` handlers load by id with no ownership check. Moot while there is no
-   authenticated user — but flag it the moment identity or tenancy is introduced.
+10. **IDOR.** `/{id}` handlers load by id with no ownership check. There is now an
+    authenticated user but no per-user or per-tenant ownership model — every signed-in
+    user may read every record by design. Flag the moment a change implies otherwise
+    (a "my orders" screen, a customer-facing login, anything tenant-scoped).
 
 ## Performance checklist (P2)
 

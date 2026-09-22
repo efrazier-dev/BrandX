@@ -11,6 +11,7 @@ import com.brandx.web.form.OrderForm;
 import com.brandx.web.form.OrderItemForm;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -24,6 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * <p>Authorization note: orders are the one area STAFF can change, because taking and
+ * amending orders is the day-to-day job this role exists for. Deleting one is still
+ * ADMIN-only — it discards the line items with it (orphanRemoval), so it destroys order
+ * history rather than correcting it. See {@link ProductService} for why these checks are
+ * on the service rather than the controller.
+ */
 @Service
 @Transactional(readOnly = true)
 public class OrderService {
@@ -80,6 +88,7 @@ public class OrderService {
     }
 
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public Order create(OrderForm form) {
         Order order = new Order();
         order.setOrderNumber(generateOrderNumber());
@@ -89,6 +98,7 @@ public class OrderService {
     }
 
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public Order update(Long id, OrderForm form) {
         Order order = getDetail(id);
         applyForm(order, form);
@@ -96,6 +106,7 @@ public class OrderService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {
         Order order = orders.findById(id)
                 .orElseThrow(() -> new NotFoundException("No order exists with id " + id));

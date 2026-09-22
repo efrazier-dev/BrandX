@@ -106,6 +106,52 @@ body {
     color: #fff;
 }
 
+/* Signed-in identity, pushed to the far right of the bar. */
+.topbar-user {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.who {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13px;
+    color: #c3c9d6;
+    white-space: nowrap;
+}
+
+.who-name {
+    font-weight: 600;
+    color: #fff;
+}
+
+.who-role {
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #dfe3ea;
+}
+
+/* Reads as a quiet control against the dark bar rather than a white button. */
+.btn-logout {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #c3c9d6;
+}
+
+.btn-logout:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.45);
+    color: #fff;
+}
+
 /* ---------- page scaffolding ---------- */
 
 main.container {
@@ -595,4 +641,85 @@ textarea {
 
 a {
     color: var(--accent);
+}
+
+/* ---------- sign-in screen ----------
+   The one page with no topbar and no container, so it centres its own card rather than
+   inheriting the standard page scaffolding.
+*/
+
+.auth-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 32px;
+}
+
+.auth-brand {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+.auth-brand span {
+    color: var(--accent);
+}
+
+.auth-lede {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin: 4px 0 24px;
+}
+
+/* The shared .alert centres itself in a 1100px column; inside the card it just fills it. */
+.auth-alert {
+    max-width: none;
+    margin: 0 0 18px;
+    font-size: 14px;
+}
+
+.auth-card .field {
+    max-width: none;
+}
+
+.auth-card input[type=password] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #c5cbd6;
+    border-radius: var(--radius);
+    font: inherit;
+    background: #fff;
+    color: var(--ink);
+}
+
+.auth-submit {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.auth-hint {
+    margin: 22px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    line-height: 1.6;
+}
+
+.auth-hint code {
+    background: #eceff4;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 12px;
 }

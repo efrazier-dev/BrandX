@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Orders')}"></head>
 <body>
 <header th:replace="~{fragments/layout :: topbar('orders')}"></header>
@@ -66,7 +67,12 @@
                 <td class="actions">
                     <a class="btn btn-small" th:href="@{/orders/{id}/edit(id=${order.id})}">
                         <th:block th:replace="~{fragments/layout :: icon-edit}"></th:block> Edit</a>
+                    <!--
+                      Creating and editing orders is STAFF work, but deleting one takes
+                      its line items with it, so that stays with ADMIN.
+                    -->
                     <form method="post" th:action="@{/orders/{id}/delete(id=${order.id})}"
+                          sec:authorize="hasRole('ADMIN')"
                           onsubmit="return confirm('Delete this order and all of its line items?')">
                         <button type="submit" class="btn btn-small btn-danger">
                             <th:block th:replace="~{fragments/layout :: icon-trash}"></th:block> Delete</button>

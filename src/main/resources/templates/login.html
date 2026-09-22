@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!--
+  Sign-in screen. Deliberately does not pull in the topbar fragment: there is nothing to
+  navigate to yet, and a nav bar full of links that all bounce back here reads as broken.
+-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Sign in')}"></head>
+<body class="auth-body">
+
+<main class="auth-card">
+    <div class="auth-brand">Brand<span>X</span></div>
+    <p class="auth-lede">Sign in to manage products, orders and customers.</p>
+
+    <!--
+      Both flags are set by SecurityConfig (failureUrl / logoutSuccessUrl) as bare query
+      parameters, so they are tested for presence rather than for a value.
+    -->
+    <div class="alert alert-bad auth-alert" th:if="${param.error != null}">
+        Incorrect username or password.
+    </div>
+    <div class="alert alert-ok auth-alert" th:if="${param.logout != null}">
+        You have been signed out.
+    </div>
+
+    <!--
+      th:action, not a plain action: that is what makes Thymeleaf add the CSRF token
+      Spring Security expects on this POST.
+    -->
+    <form method="post" th:action="@{/login}">
+        <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" autocomplete="username" autofocus required>
+        </div>
+
+        <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary auth-submit">Sign in</button>
+    </form>
+
+    <p class="auth-hint">
+        Demo accounts on this build: <code>admin</code> / <code>admin</code> for full access,
+        <code>staff</code> / <code>staff</code> for read plus order entry.
+    </p>
+</main>
+
+</body>
+</html>

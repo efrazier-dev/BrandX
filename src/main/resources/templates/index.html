@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
 <body>
 <header th:replace="~{fragments/layout :: topbar('')}"></header>
@@ -39,9 +40,9 @@
         <div class="form-actions" style="border-top:0; padding-top:0; margin-top:14px">
             <a class="btn btn-primary" th:href="@{/orders/new}">
                 <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New order</a>
-            <a class="btn" th:href="@{/products/new}">
+            <a class="btn" th:href="@{/products/new}" sec:authorize="hasRole('ADMIN')">
                 <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New product</a>
-            <a class="btn" th:href="@{/customers/new}">
+            <a class="btn" th:href="@{/customers/new}" sec:authorize="hasRole('ADMIN')">
                 <th:block th:replace="~{fragments/layout :: icon-plus}"></th:block> New customer</a>
         </div>
     </div>

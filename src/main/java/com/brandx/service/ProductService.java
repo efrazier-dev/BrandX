@@ -5,12 +5,24 @@ import com.brandx.repository.OrderItemRepository;
 import com.brandx.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+/**
+ * <p>Authorization note: the {@code @PreAuthorize} annotations sit here rather than on
+ * {@link com.brandx.web.ProductController} because this is the transactional boundary —
+ * a second controller, a scheduled job or a future REST endpoint reaching for these
+ * methods is checked too, instead of inheriting whatever the web layer happened to
+ * declare. The matching {@code sec:authorize} guards in the templates only hide buttons;
+ * these annotations are the control.
+ *
+ * <p>Reads are left unannotated: any authenticated user may browse products, which the
+ * filter chain already enforces.
+ */
 @Service
 @Transactional(readOnly = true)
 public class ProductService {
@@ -51,6 +63,7 @@ public class ProductService {
      * would let a crafted POST overwrite an arbitrary existing row.
      */
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public Product create(Product submitted) {
         requireUniqueSku(submitted.getSku(), null);
         Product product = new Product();
@@ -69,6 +82,7 @@ public class ProductService {
      * from the database, not from whatever the browser posted.
      */
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public Product update(Long id, Product submitted) {
         Product existing = get(id);
         requireUniqueSku(submitted.getSku(), id);
@@ -82,6 +96,7 @@ public class ProductService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {
         Product product = get(id);
         long lines = orderItems.countByProductId(id);

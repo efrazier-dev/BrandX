@@ -5,12 +5,18 @@ import com.brandx.repository.CustomerRepository;
 import com.brandx.repository.OrderRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+/**
+ * <p>Authorization note: writes are ADMIN-only and reads are open to any authenticated
+ * user, matching {@link ProductService} — see the longer explanation there for why the
+ * annotations live on the service rather than the controller.
+ */
 @Service
 @Transactional(readOnly = true)
 public class CustomerService {
@@ -57,6 +63,7 @@ public class CustomerService {
      * would let a crafted POST overwrite an arbitrary existing row.
      */
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public Customer create(Customer submitted) {
         requireUniqueEmail(submitted.getEmail(), null);
         Customer customer = new Customer();
@@ -69,6 +76,7 @@ public class CustomerService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public Customer update(Long id, Customer submitted) {
         Customer existing = get(id);
         requireUniqueEmail(submitted.getEmail(), id);
@@ -81,6 +89,7 @@ public class CustomerService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {
         Customer customer = get(id);
         long orderCount = orders.countByCustomerId(id);
