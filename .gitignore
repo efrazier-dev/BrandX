@@ -32,6 +32,13 @@ build/
 ### VS Code ###
 .vscode/
 
+### Visual Studio ###
+.vs/
+
 ### Claude Code ###
 # Shared agents/commands are tracked; per-developer permissions are not.
 .claude/settings.local.json
+
+### SSH keys ###
+id_ed25519
+id_ed25519.pub
